@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifego — Sua Vida Conectada</title>
+    <meta name="theme-color" content="#1E88E5">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --primary: #1E88E5;
+            --primary-dark: #1565C0;
+            --accent: #FF3B5C;
+            --bg: #f3f6fb;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --glass: rgba(16, 24, 40, 0.04);
+            --radius: 12px;
+            --max-width: 1200px;
+            --text: #071127;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* ===== TELA DE TERMOS ===== */
+        .terms-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1100;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .terms-screen.active {
+            display: flex;
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .terms-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+        }
+
+        .terms-title {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .terms-subtitle {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .terms-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .terms-content {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .terms-section {
+            margin-bottom: 25px;
+        }
+
+        .terms-section h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .terms-section p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .terms-section ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .terms-section li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .terms-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            background: var(--glass);
+            border-radius: var(--radius);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .checkbox-group.required {
+            background: rgba(30, 136, 229, 0.05);
+            border-color: var(--primary);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-label {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .checkbox-label strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .required-badge {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .terms-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            text-align: center;
+            flex: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+
+        .btn:disabled {
+            background: var(--muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--muted);
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            color: var(--text);
+        }
+
+        /* ===== TELA INICIAL AZUL ===== */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.8s ease-in-out;
+            padding: 20px;
+        }
+
+        .welcome-screen.hidden {
+            transform: translateY(-100%);
+        }
+
+        .welcome-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+            border-radius: 20px;
+        }
+
+        .welcome-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .welcome-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+            max-width: 90%;
+        }
+
+        /* ===== TELAS DE AUTENTICAÇÃO ===== */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-screen.active {
+            display: flex;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+        }
+
+        .auth-title {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .auth-form {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            background: var(--bg);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .auth-link {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 20px;
+        }
+
+        .auth-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ===== APP PRINCIPAL ===== */
+        .main-app {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .main-app.active {
+            display: block;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--card);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 12px 0;
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            background: var(--bg);
+            width: 250px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+        }
+
+        .icon-btn {
+            background: var(--card);
+            border: 1px solid rgba(11, 17, 32, 0.04);
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--glass);
+        }
+
+        .icon-btn img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        /* Stories */
+        .stories-container {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            min-width: 70px;
+        }
+
+        .story-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            padding: 2px;
+            background: var(--card);
+        }
+
+        .story-username {
+            font-size: 12px;
+            color: var(--text);
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .story-add {
+            position: relative;
+        }
+
+        .story-add::after {
+            content: '+';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Feed Instagram Style */
+        .feed {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .post {
+            background: var(--card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .post:hover {
+            transform: translateY(-2px);
+        }
+
+        .post-media {
+            position: relative;
+            background: #000;
+            aspect-ratio: 9/16;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .post-media img,
+        .post-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn.liked {
+            background: var(--accent);
+        }
+
+        .action-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .action-count {
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 5px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .post-content {
+            padding: 15px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .post-text {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: var(--glass);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Botão de Modelos da Comunidade */
+        .models-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--card);
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .models-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .model-card {
+            background: var(--glass);
+            border-radius: var(--radius);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.2);
+        }
+
+        .model-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 10px;
+            border-radius: 12px;
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .model-stats {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            transition: color 0.2s;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 25px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-title {
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Animações */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .feed {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+            
+            .header-content {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .terms-content {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-box {
+                display: none;
+            }
+            
+            .models-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .terms-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== TELA DE TERMOS E POLÍTICA ===== -->
+    <div class="terms-screen" id="termsScreen">
+        <div class="terms-header">
+            <img src="logolifego-192x192.png" alt="Lifego" class="terms-logo" onerror="this.src='modelo.png'">
+            <h2 class="terms-title">Termos de Uso</h2>
+            <p class="terms-subtitle">Leia e aceite os termos para continuar</p>
+        </div>
+
+        <div class="terms-container">
+            <div class="terms-content">
+                <div class="terms-section">
+                    <h3>1. Aceitação dos Termos</h3>
+                    <p>Ao acessar e usar o Lifego, você concorda com estes Termos de Uso e com nossa Política de Privacidade. Se não concordar com algum termo, não use nossos serviços.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>2. Elegibilidade</h3>
+                    <p>Você deve ter pelo menos 13 anos para usar o Lifego. Usuários entre 13 e 18 anos precisam de autorização dos pais ou responsáveis.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>3. Conta do Usuário</h3>
+                    <ul>
+                        <li>Você é responsável por manter a segurança da sua conta</li>
+                        <li>Não compartilhe suas credenciais de login</li>
+                        <li>Mantenha informações atualizadas e precisas</li>
+                        <li>Uma conta por pessoa - não crie múltiplas contas</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3>4. Conteúdo do Usuário</h3>
+                    <p>Você mantém os direitos sobre o conteúdo que publica, mas nos concede licença para exibi-lo e distribuí-lo no Lifego. Não publique conteúdo que:</p>
+                    <ul>
+                        <li>Viole direitos autorais ou propriedade intelectual</li>
+                        <li>Seja ilegal, ofensivo ou prejudicial</li>
+                        <li>Contenha discurso de ódio ou assédio</li>
+                        <li>Seja spam ou conteúdo enganoso</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3>5. Privacidade e Dados</h3>
+                    <p>Coletamos e usamos seus dados conforme descrito em nossa Política de Privacidade. Você tem direitos sobre seus dados pessoais e pode solicitar sua exclusão.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>6. Conduta Proibida</h3>
+                    <p>Não é permitido:</p>
+                    <ul>
+                        <li>Assediar, intimidar ou ameaçar outros usuários</li>
+                        <li>Publicar conteúdo sexualmente explícito</li>
+                        <li>Usar bots ou métodos automatizados</li>
+                        <li>Tentar acessar contas de outros usuários</li>
+                        <li>Distribuir vírus ou malware</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h3>7. Propriedade Intelectual</h3>
+                    <p>O Lifego e seu conteúdo são protegidos por leis de propriedade intelectual. Você não pode copiar, modificar ou distribuir nosso conteúdo sem permissão.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>8. Moderação de Conteúdo</h3>
+                    <p>Reservamo-nos o direito de remover conteúdo que viole estes termos e suspender ou encerrar contas de infratores.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>9. Limitação de Responsabilidade</h3>
+                    <p>O Lifego é fornecido "como está". Não nos responsabilizamos por danos indiretos ou perda de dados.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>10. Alterações nos Termos</h3>
+                    <p>Podemos atualizar estes termos periodicamente. O uso continuado após alterações significa que você aceita os novos termos.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>11. Lei Aplicável</h3>
+                    <p>Estes termos são regidos pelas leis do Brasil. Disputas serão resolvidas nos tribunais competentes.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h3>12. Contato</h3>
+                    <p>Dúvidas sobre estes termos? Entre em contato: suporte@lifego.com</p>
+                </div>
+            </div>
+
+            <div class="terms-checkboxes">
+                <div class="checkbox-group required">
+                    <input type="checkbox" id="termsAccept" class="terms-checkbox">
+                    <label for="termsAccept" class="checkbox-label">
+                        <strong>Termos de Uso do Lifego <span class="required-badge">OBRIGATÓRIO</span></strong>
+                        Eu li e concordo com os Termos de Uso do Lifego descritos acima. Entendo que violações podem resultar em suspensão ou encerramento da minha conta.
+                    </label>
+                </div>
+
+                <div class="checkbox-group required">
+                    <input type="checkbox" id="privacyAccept" class="terms-checkbox">
+                    <label for="privacyAccept" class="checkbox-label">
+                        <strong>Política de Privacidade <span class="required-badge">OBRIGATÓRIO</span></strong>
+                        Concordo com a coleta, uso e processamento dos meus dados pessoais conforme descrito na Política de Privacidade do Lifego.
+                    </label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="marketingAccept" class="terms-checkbox">
+                    <label for="marketingAccept" class="checkbox-label">
+                        <strong>Comunicações de Marketing</strong>
+                        Aceito receber e-mails promocionais, novidades sobre recursos e atualizações do Lifego. Posso cancelar a qualquer momento.
+                    </label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="analyticsAccept" class="terms-checkbox">
+                    <label for="analyticsAccept" class="checkbox-label">
+                        <strong>Dados de Analytics</strong>
+                        Permito que o Lifego use meus dados anônimos para melhorar os serviços e personalizar minha experiência.
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="terms-actions">
+            <button class="btn btn-outline" id="declineTerms">Recusar</button>
+            <button class="btn" id="acceptTerms" disabled>Aceitar e Continuar</button>
+        </div>
+    </div>
+
+    <!-- ===== TELA INICIAL AZUL ===== -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <img src="logolifego-192x192.png" alt="Lifego" class="welcome-logo" onerror="this.src='modelo.png'">
+        <h1 class="welcome-title">Lifego</h1>
+        <p class="welcome-subtitle">Sua Vida Conectada</p>
+        <div class="welcome-actions">
+            <button class="btn" id="loginBtn">Entrar</button>
+            <button class="btn btn-outline" id="registerBtn">Criar Conta</button>
+        </div>
+    </div>
+
+    <!-- ===== TELA DE LOGIN ===== -->
+    <div class="auth-screen" id="loginScreen">
+        <button class="back-btn" id="backFromLogin">
+            <img src="voltar.png" alt="Voltar" style="width: 16px; height: 16px;" onerror="this.src='modelo.png'">
+            Voltar
+        </button>
+        <div class="auth-header">
+            <img src="logolifego-192x192.png" alt="Lifego" class="auth-logo" onerror="this.src='modelo.png'">
+            <h2 class="auth-title">Bem-vindo de volta</h2>
+            <p class="auth-subtitle">Entre na sua conta</p>
+        </div>
+        <div class="auth-form">
+            <div class="form-group">
+                <input type="text" class="form-input" id="loginUsername" placeholder="Usuário ou E-mail">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-input" id="loginPassword" placeholder="Senha">
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" id="doLogin">Entrar</button>
+            </div>
+            <div class="auth-link">
+                <a href="#" id="forgotPassword">Esqueci minha senha</a>
+            </div>
+            <div class="auth-link">
+                Não tem conta? <a href="#" id="goToRegister">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TELA DE CADASTRO ===== -->
+    <div class="auth-screen" id="registerScreen">
+        <button class="back-btn" id="backFromRegister">
+            <img src="voltar.png" alt="Voltar" style="width: 16px; height: 16px;" onerror="this.src='modelo.png'">
+            Voltar
+        </button>
+        <div class="auth-header">
+            <img src="logolifego-192x192.png" alt="Lifego" class="auth-logo" onerror="this.src='modelo.png'">
+            <h2 class="auth-title">Criar Conta</h2>
+            <p class="auth-subtitle">Junte-se à comunidade</p>
+        </div>
+        <div class="auth-form">
+            <div class="form-group">
+                <input type="text" class="form-input" id="regUsername" placeholder="Nome de usuário">
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-input" id="regEmail" placeholder="E-mail">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-input" id="regPassword" placeholder="Senha">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-input" id="regConfirmPassword" placeholder="Confirmar senha">
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" id="doRegister">Criar Conta</button>
+            </div>
+            <div class="auth-link">
+                Já tem conta? <a href="#" id="goToLogin">Faça login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TELA DE RECUPERAÇÃO DE SENHA ===== -->
+    <div class="auth-screen" id="forgotScreen">
+        <button class="back-btn" id="backFromForgot">
+            <img src="voltar.png" alt="Voltar" style="width: 16px; height: 16px;" onerror="this.src='modelo.png'">
+            Voltar
+        </button>
+        <div class="auth-header">
+            <img src="logolifego-192x192.png" alt="Lifego" class="auth-logo" onerror="this.src='modelo.png'">
+            <h2 class="auth-title">Recuperar Senha</h2>
+            <p class="auth-subtitle">Informe seu e-mail para redefinir</p>
+        </div>
+        <div class="auth-form">
+            <div class="form-group">
+                <input type="email" class="form-input" id="forgotEmail" placeholder="Seu e-mail">
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" id="doForgot">Enviar Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== APP PRINCIPAL ===== -->
+    <div class="main-app" id="mainApp">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <img src="logolifego-192x192.png" alt="Lifego" onerror="this.src='modelo.png'">
+                        <div class="logo-text">
+                            <h1>Lifego</h1>
+                            <p>Explorar • Criar</p>
+                        </div>
+                    </div>
+                    
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <img src="procurar.png" alt="Pesquisar" class="search-icon" onerror="this.src='modelo.png'">
+                            <input type="text" placeholder="Pesquisar criadores, tags..." id="searchInput">
+                        </div>
+                        
+                        <button class="icon-btn" title="Notificações" id="notificationsBtn">
+                            <img src="notificações.png" alt="Notificações" onerror="this.src='modelo.png'">
+                        </button>
+                        
+                        <button class="icon-btn" title="Chat" id="chatBtn">
+                            <img src="chat.png" alt="Chat" onerror="this.src='modelo.png'">
+                        </button>
+                        
+                        <button class="icon-btn" title="IA" id="aiBtn">
+                            <img src="ia.png" alt="IA" onerror="this.src='modelo.png'">
+                        </button>
+
+                        <button class="icon-btn" title="Galeria" id="galleryBtn">
+                            <img src="modelo.png" alt="Galeria" onerror="this.src='modelo.png'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Conteúdo Principal -->
+        <main class="container">
+            <!-- Stories -->
+            <div class="stories-container">
+                <div class="story story-add">
+                    <img src="perfil.png" alt="Seu Story" class="story-avatar" onerror="this.src='modelo.png'">
+                    <span class="story-username">Seu Story</span>
+                </div>
+                <div class="story">
+                    <img src="perfil.png" alt="surfer_br" class="story-avatar" onerror="this.src='modelo.png'">
+                    <span class="story-username">surfer_br</span>
+                </div>
+                <div class="story">
+                    <img src="perfil.png" alt="techlover" class="story-avatar" onerror="this.src='modelo.png'">
+                    <span class="story-username">techlover</span>
+                </div>
+                <div class="story">
+                    <img src="perfil.png" alt="chef_lu" class="story-avatar" onerror="this.src='modelo.png'">
+                    <span class="story-username">chef_lu</span>
+                </div>
+            </div>
+
+            <!-- Seção de Modelos da Comunidade -->
+            <div class="models-section">
+                <h2 class="models-title">🎨 Modelos da Comunidade</h2>
+                <p>Use templates criados pela comunidade para seus posts</p>
+                <div class="models-grid">
+                    <div class="model-card" data-model="trending">
+                        <img src="modelo.png" alt="Trending" class="model-icon" onerror="this.src='modelo.png'">
+                        <div class="model-name">Viral Template</div>
+                        <div class="model-stats">1.2M usos</div>
+                    </div>
+                    <div class="model-card" data-model="minimal">
+                        <img src="modelo.png" alt="Minimal" class="model-icon" onerror="this.src='modelo.png'">
+                        <div class="model-name">Minimal</div>
+                        <div class="model-stats">850K usos</div>
+                    </div>
+                    <div class="model-card" data-model="funny">
+                        <img src="modelo.png" alt="Funny" class="model-icon" onerror="this.src='modelo.png'">
+                        <div class="model-name">Humor</div>
+                        <div class="model-stats">620K usos</div>
+                    </div>
+                    <div class="model-card" data-model="professional">
+                        <img src="modelo.png" alt="Professional" class="model-icon" onerror="this.src='modelo.png'">
+                        <div class="model-name">Profissional</div>
+                        <div class="model-stats">450K usos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed -->
+            <div class="feed" id="feedContainer">
+                <!-- Posts serão carregados aqui via JavaScript -->
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" id="navHome">
+                <img src="casa.png" alt="Início" onerror="this.src='modelo.png'">
+                <span class="nav-label">Início</span>
+            </button>
+            <button class="nav-item" id="navExplore">
+                <img src="procurar.png" alt="Explorar" onerror="this.src='modelo.png'">
+                <span class="nav-label">Explorar</span>
+            </button>
+            <button class="nav-item" id="navCreate">
+                <img src="upload.png" alt="Criar" onerror="this.src='modelo.png'">
+                <span class="nav-label">Criar</span>
+            </button>
+            <button class="nav-item" id="navProfile">
+                <img src="perfil.png" alt="Perfil" onerror="this.src='modelo.png'">
+                <span class="nav-label">Perfil</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modal de Upload -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeUpload">
+                <img src="voltar.png" alt="Fechar" onerror="this.src='modelo.png'">
+            </button>
+            <h3 class="modal-title">Criar Publicação</h3>
+            <div class="form-group">
+                <input type="file" class="form-input" id="mediaUpload" accept="image/*,video/*">
+            </div>
+            <div class="form-group">
+                <textarea class="form-input" id="postCaption" placeholder="Adicione uma legenda..." rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" id="publishPost">Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DADOS E ESTADO =====
+        const samplePosts = [
+            {
+                id: 1,
+                author: "lifego",
+                avatar: "perfil.png",
+                caption: "🌟 Bem-vindo ao Lifego! Use modelos da comunidade para criar conteúdo incrível!",
+                media: "modelo.png",
+                mediaType: "image",
+                likes: 999999,
+                comments: [
+                    { author: "ana_dev", text: "Excelente projeto!" },
+                    { author: "surfer_br", text: "Adorei os templates!" }
+                ],
+                tags: ["#pwa", "#tecnologia", "#modelos"],
+                timestamp: "2 horas atrás"
+            },
+            {
+                id: 2,
+                author: "surfer_br",
+                avatar: "perfil.png",
+                caption: "Ondas perfeitas hoje! 🌊 Usando o template 'Viral' da comunidade.",
+                media: "modelo.png",
+                mediaType: "video",
+                likes: 1245,
+                comments: [],
+                tags: ["#surf", "#praia", "#viral"],
+                timestamp: "5 horas atrás"
+            },
+            {
+                id: 3,
+                author: "techlover",
+                avatar: "perfil.png",
+                caption: "Setup minimalista usando template 'Profissional'. Que acham? 💻",
+                media: "modelo.png",
+                mediaType: "image",
+                likes: 521,
+                comments: [
+                    { author: "lifego", text: "Clean demais! 👏" }
+                ],
+                tags: ["#tech", "#setup", "#minimal"],
+                timestamp: "1 dia atrás"
+            }
+        ];
+
+        let currentUser = null;
+        let posts = [...samplePosts];
+        let darkMode = false;
+
+        // ===== ELEMENTOS DOM =====
+        const termsScreen = document.getElementById('termsScreen');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const loginScreen = document.getElementById('loginScreen');
+        const registerScreen = document.getElementById('registerScreen');
+        const forgotScreen = document.getElementById('forgotScreen');
+        const mainApp = document.getElementById('mainApp');
+        const feedContainer = document.getElementById('feedContainer');
+        const uploadModal = document.getElementById('uploadModal');
+
+        // ===== FUNÇÕES DE TERMOS =====
+        function showTerms() {
+            welcomeScreen.classList.add('hidden');
+            termsScreen.classList.add('active');
+        }
+
+        function checkTermsAcceptance() {
+            const termsAccept = document.getElementById('termsAccept');
+            const privacyAccept = document.getElementById('privacyAccept');
+            const acceptButton = document.getElementById('acceptTerms');
+            
+            acceptButton.disabled = !(termsAccept.checked && privacyAccept.checked);
+        }
+
+        function acceptTerms() {
+            localStorage.setItem('lifego_terms_accepted', 'true');
+            termsScreen.classList.remove('active');
+            showLogin();
+        }
+
+        function declineTerms() {
+            alert('Para usar o Lifego, você precisa aceitar os Termos de Uso e Política de Privacidade.');
+        }
+
+        // ===== FUNÇÕES DE AUTENTICAÇÃO =====
+        function showLogin() {
+            loginScreen.classList.add('active');
+        }
+
+        function showRegister() {
+            registerScreen.classList.add('active');
+        }
+
+        function showForgot() {
+            loginScreen.classList.remove('active');
+            forgotScreen.classList.add('active');
+        }
+
+        function backToWelcome() {
+            loginScreen.classList.remove('active');
+            registerScreen.classList.remove('active');
+            forgotScreen.classList.remove('active');
+            welcomeScreen.classList.remove('hidden');
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (username && password) {
+                currentUser = { username, id: 'user_' + Date.now() };
+                loginScreen.classList.remove('active');
+                mainApp.classList.add('active');
+                renderFeed();
+                alert(`Bem-vindo, ${username}!`);
+            } else {
+                alert('Preencha todos os campos!');
+            }
+        }
+
+        function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (username && email && password && confirmPassword) {
+                if (password !== confirmPassword) {
+                    alert('As senhas não coincidem!');
+                    return;
+                }
+                
+                currentUser = { username, email, id: 'user_' + Date.now() };
+                registerScreen.classList.remove('active');
+                mainApp.classList.add('active');
+                renderFeed();
+                alert(`Conta criada com sucesso, ${username}!`);
+            } else {
+                alert('Preencha todos os campos!');
+            }
+        }
+
+        // ===== FUNÇÕES DO FEED =====
+        function renderFeed() {
+            feedContainer.innerHTML = '';
+            
+            posts.forEach(post => {
+                const postElement = createPostElement(post);
+                feedContainer.appendChild(postElement);
+            });
+        }
+
+        function createPostElement(post) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            postDiv.innerHTML = `
+                <div class="post-media">
+                    ${post.mediaType === 'video' ? 
+                        `<video controls>
+                            <source src="${post.media}" type="video/mp4">
+                        </video>` : 
+                        `<img src="${post.media}" alt="${post.caption}" onerror="this.src='modelo.png'">`
+                    }
+                    <div class="post-actions">
+                        <button class="action-btn like-btn" data-post-id="${post.id}">
+                            <img src="like.png" alt="Curtir" onerror="this.src='modelo.png'">
+                        </button>
+                        <div class="action-count">${formatCount(post.likes)}</div>
+                        
+                        <button class="action-btn comment-btn" data-post-id="${post.id}">
+                            <img src="comentarios.png" alt="Comentários" onerror="this.src='modelo.png'">
+                        </button>
+                        <div class="action-count">${post.comments.length}</div>
+                        
+                        <button class="action-btn share-btn" data-post-id="${post.id}">
+                            <img src="compartilhar.png" alt="Compartilhar" onerror="this.src='modelo.png'">
+                        </button>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <div class="post-header">
+                        <img src="${post.avatar}" alt="${post.author}" class="avatar" onerror="this.src='modelo.png'">
+                        <div class="user-info">
+                            <h3>@${post.author}</h3>
+                            <p>${post.timestamp}</p>
+                        </div>
+                    </div>
+                    <div class="post-text">${post.caption}</div>
+                    <div class="post-tags">
+                        ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            
+            return postDiv;
+        }
+
+        function formatCount(count) {
+            if (count >= 1000000) {
+                return (count / 1000000).toFixed(1) + 'M';
+            } else if (count >= 1000) {
+                return (count / 1000).toFixed(1) + 'K';
+            }
+            return count;
+        }
+
+        function toggleLike(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.likes += 1;
+                const likeBtn = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+                likeBtn.classList.add('liked');
+                likeBtn.querySelector('.action-count').textContent = formatCount(post.likes);
+            }
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se já aceitou os termos
+            const termsAccepted = localStorage.getItem('lifego_terms_accepted');
+            
+            if (!termsAccepted) {
+                // Mostrar termos na primeira vez
+                setTimeout(() => {
+                    showTerms();
+                }, 1000);
+            } else {
+                // Já aceitou, mostrar tela inicial
+                welcomeScreen.classList.remove('hidden');
+            }
+
+            // Event Listeners dos Termos
+            document.getElementById('termsAccept').addEventListener('change', checkTermsAcceptance);
+            document.getElementById('privacyAccept').addEventListener('change', checkTermsAcceptance);
+            document.getElementById('acceptTerms').addEventListener('click', acceptTerms);
+            document.getElementById('declineTerms').addEventListener('click', declineTerms);
+
+            // Event Listeners da Tela Inicial
+            document.getElementById('loginBtn').addEventListener('click', showTerms);
+            document.getElementById('registerBtn').addEventListener('click', showTerms);
+
+            // Event Listeners de Autenticação
+            document.getElementById('backFromLogin').addEventListener('click', backToWelcome);
+            document.getElementById('backFromRegister').addEventListener('click', backToWelcome);
+            document.getElementById('backFromForgot').addEventListener('click', () => {
+                forgotScreen.classList.remove('active');
+                loginScreen.classList.add('active');
+            });
+
+            document.getElementById('doLogin').addEventListener('click', login);
+            document.getElementById('doRegister').addEventListener('click', register);
+            document.getElementById('forgotPassword').addEventListener('click', showForgot);
+            document.getElementById('goToRegister').addEventListener('click', () => {
+                loginScreen.classList.remove('active');
+                registerScreen.classList.add('active');
+            });
+            document.getElementById('goToLogin').addEventListener('click', () => {
+                registerScreen.classList.remove('active');
+                loginScreen.classList.add('active');
+            });
+            document.getElementById('doForgot').addEventListener('click', () => {
+                alert('Link de recuperação enviado para seu e-mail!');
+                forgotScreen.classList.remove('active');
+                loginScreen.classList.add('active');
+            });
+
+            // Event Listeners do Feed
+            feedContainer.addEventListener('click', (e) => {
+                if (e.target.closest('.like-btn')) {
+                    const postId = parseInt(e.target.closest('.like-btn').dataset.postId);
+                    toggleLike(postId);
+                }
+                
+                if (e.target.closest('.comment-btn')) {
+                    alert('Abrindo comentários...');
+                }
+                
+                if (e.target.closest('.share-btn')) {
+                    alert('Compartilhando post...');
+                }
+            });
+
+            // Event Listeners dos Modelos
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const model = this.dataset.model;
+                    alert(`Usando template: ${model}`);
+                    uploadModal.classList.add('active');
+                });
+            });
+
+            // Event Listeners de Upload
+            document.getElementById('navCreate').addEventListener('click', () => {
+                uploadModal.classList.add('active');
+            });
+
+            document.getElementById('closeUpload').addEventListener('click', () => {
+                uploadModal.classList.remove('active');
+            });
+
+            document.getElementById('publishPost').addEventListener('click', () => {
+                const fileInput = document.getElementById('mediaUpload');
+                const caption = document.getElementById('postCaption').value;
+                
+                if (!fileInput.files[0]) {
+                    alert('Selecione uma mídia para publicar!');
+                    return;
+                }
+                
+                alert('Publicação enviada com sucesso!');
+                uploadModal.classList.remove('active');
+                
+                // Resetar formulário
+                fileInput.value = '';
+                document.getElementById('postCaption').value = '';
+            });
+
+            // Outros Event Listeners
+            document.getElementById('notificationsBtn').addEventListener('click', () => {
+                alert('Abrindo notificações...');
+            });
+
+            document.getElementById('chatBtn').addEventListener('click', () => {
+                alert('Abrindo chat...');
+            });
+
+            document.getElementById('aiBtn').addEventListener('click', () => {
+                alert('Abrindo ferramentas de IA...');
+            });
+
+            document.getElementById('galleryBtn').addEventListener('click', () => {
+                alert('Abrindo galeria...');
+            });
+
+            // Navegação inferior
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+ <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch(err => console.log(" Erro no SW:", err));
+    }
+ </script>
+</body>
+</html>
