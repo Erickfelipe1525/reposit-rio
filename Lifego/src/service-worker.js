@@ -1,6 +1,6 @@
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("Relogio-Motivacional-Digital-cache").then(cache => {
+    caches.open("Lifego-cache").then(cache => {
       return cache.addAll([
         "index.html",
         "manifest.json",
@@ -8,18 +8,16 @@ self.addEventListener("install", event => {
         "logolifego-512x512.png",
         "casa.png",
         "chat.png",
-        "comentario.png",
+        "comentarios.png",
         "compartilhar.png",
         "ia.png",
         "like.png",
-        "logolifego-192x192.png",
-        "logolifego-512x512.png",
         "modelo.png",
-        "notificacao.png",
+        "notificações.png",
         "perfil.png",
         "procurar.png",
         "upload.png",
-        "voltar.png",
+        "voltar.png"
       ]);
     })
   );
@@ -30,4 +28,3 @@ self.addEventListener("fetch", event => {
     caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
-
