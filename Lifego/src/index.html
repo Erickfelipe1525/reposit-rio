@@ -1,0 +1,1409 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lifego — Sua Vida Conectada</title>
+    <meta name="theme-color" content="#1E88E5">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* ============================
+       Lifego - Single-file app
+       HTML + CSS + JS inline
+       ============================ */
+
+        :root {
+            --primary: #1E88E5;
+            /* Azul Padrão */
+            --accent: #FF3B5C;
+            /* Vermelho/Pink para Likes */
+            --bg: #f3f6fb;
+            /* Fundo Leve */
+            --card: #ffffff;
+            /* Fundo de Cards/Elementos */
+            --muted: #6b7280;
+            /* Texto secundário */
+            --glass: rgba(16, 24, 40, 0.04);
+            --radius: 12px;
+            --max-width: 1200px;
+            --text: #071127;
+            /* Texto principal */
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s
+        }
+
+        /* Scrollbar clean */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        body.dark::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .app {
+            max-width: var(--max-width);
+            margin: 18px auto;
+            padding: 0 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--card);
+            border-radius: 14px;
+            box-shadow: 0 10px 28px rgba(11, 17, 32, 0.06);
+            border: 1px solid rgba(11, 17, 32, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            transition: background 0.3s
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .brand img {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            object-fit: cover
+        }
+
+        .brand-title {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--primary)
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .top-actions input {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid #e6eef6;
+            min-width: 260px;
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.2s
+        }
+
+        .top-actions input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2)
+        }
+
+        .icon-btn {
+            background: var(--card);
+            border: 1px solid rgba(11, 17, 32, 0.04);
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s
+        }
+
+        .icon-btn:hover {
+            background: var(--glass)
+        }
+
+        .icon-btn img,
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            display: block
+        }
+
+        .menu {
+            position: relative
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: var(--card);
+            border: 1px solid #e6eef6;
+            border-radius: 8px;
+            padding: 8px;
+            min-width: 180px;
+            box-shadow: 0 6px 18px rgba(11, 17, 32, 0.1);
+            z-index: 20
+        }
+
+        .menu-item {
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(90deg, rgba(30, 136, 229, 0.08), rgba(96, 165, 250, 0.04))
+        }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 18px;
+            align-items: start
+        }
+
+        .card {
+            background: var(--card);
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(11, 17, 32, 0.06);
+            border: 1px solid rgba(11, 17, 32, 0.03);
+            transition: background 0.3s
+        }
+
+        .card-title {
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--primary)
+        }
+
+        .categories {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .cat {
+            padding: 10px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 0;
+            cursor: pointer;
+            text-align: left;
+            color: var(--text);
+            font-weight: 600;
+            transition: all 0.2s
+        }
+
+        .cat:hover {
+            background: rgba(30, 136, 229, 0.1)
+        }
+
+        .cat.active {
+            background: linear-gradient(90deg, var(--primary), #60a5fa);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(30, 136, 229, 0.4)
+        }
+
+        .creators .creator {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(11, 17, 32, 0.02)
+        }
+
+        .creators img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary)
+        }
+
+        .stats {
+            display: flex;
+            gap: 18px;
+            justify-content: space-between
+        }
+
+        /* Feed */
+        .feed-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        .feed-card {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(11, 17, 32, 0.04);
+            background: var(--card);
+            position: relative;
+            box-shadow: 0 4px 12px rgba(11, 17, 32, 0.05);
+            transition: transform 0.2s
+        }
+
+        .feed-card:hover {
+            transform: translateY(-2px)
+        }
+
+        .video-frame {
+            background: #000;
+            height: 480px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .video-frame img,
+        .video-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+        }
+
+        .video-meta {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: var(--card);
+            border-top: 1px solid rgba(11, 17, 32, 0.03)
+        }
+
+        .video-author {
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .video-desc {
+            color: var(--muted);
+            margin-top: 6px;
+            font-size: 14px
+        }
+
+        /* Actions column on media */
+        .video-actions {
+            position: absolute;
+            right: 12px;
+            bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center
+        }
+
+        .video-actions .icon-btn {
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2)
+        }
+
+        .icon-btn.liked {
+            background: linear-gradient(90deg, var(--accent), #ff7b8f);
+            border-color: transparent
+        }
+
+        .icon-btn.liked svg path {
+            fill: #fff
+        }
+
+        .video-actions .icon-btn:hover {
+            background: rgba(255, 255, 255, 1)
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .tags button {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid #eef5ff;
+            background: linear-gradient(90deg, #f2f6fb, #fff);
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text);
+            transition: all 0.2s
+        }
+
+        .tags button:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary)
+        }
+
+        /* Bottom nav */
+        .bottom-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 18px;
+            margin: auto;
+            max-width: 420px;
+            background: var(--card);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 8px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(11, 17, 32, 0.15);
+            z-index: 100
+        }
+
+        .bottom-nav button {
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--muted);
+            transition: color 0.2s
+        }
+
+        .bottom-nav button:hover {
+            color: var(--primary)
+        }
+
+        .bottom-nav button.active {
+            color: var(--primary)
+        }
+
+        .bottom-nav button svg {
+            width: 24px;
+            height: 24px
+        }
+
+        .bottom-nav button.active svg path {
+            fill: var(--primary);
+        }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            width: 92%;
+            max-width: 450px;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(11, 17, 32, 0.2);
+            position: relative
+        }
+
+        #termsModal .modal {
+            max-width: 650px
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .terms-content {
+            max-height: 360px;
+            overflow: auto;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #eef2f7;
+            background: #fafbff;
+            margin: 8px 0;
+            font-size: 14px
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 15px
+        }
+
+        .modal-actions label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px
+        }
+
+        .auth-box {
+            padding: 8px
+        }
+
+        .auth-box .input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #e6eef6;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 0;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.2s
+        }
+
+        .btn:hover {
+            background: var(--primary)
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid rgba(11, 17, 32, 0.1);
+            color: var(--muted)
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px;
+            border-radius: 999px;
+            font-size: 20px;
+            line-height: 1;
+            background: var(--glass)
+        }
+
+        /* comments list */
+        .comments-list {
+            max-height: 240px;
+            overflow: auto;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #eef2f7;
+            background: #fafbff;
+            margin-bottom: 10px;
+        }
+
+        .comments-list div {
+            margin-bottom: 4px;
+            border-bottom: 1px dotted rgba(0, 0, 0, 0.1);
+            padding-bottom: 2px;
+        }
+
+        /* generic utilities */
+        .muted {
+            color: var(--muted)
+        }
+
+        .small {
+            font-size: 12px
+        }
+
+        .error {
+            color: #c53030
+        }
+
+        .badge {
+            background: linear-gradient(90deg, var(--primary), #60a5fa);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        /* dark theme */
+        body.dark {
+            background: #0d1117;
+            color: #e6edf3
+        }
+
+        body.dark .card,
+        body.dark .topbar,
+        body.dark .modal,
+        body.dark .bottom-nav,
+        body.dark .icon-btn {
+            background: #161b22;
+            color: #e6edf3;
+            border: 1px solid #30363d
+        }
+
+        body.dark .topbar {
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4)
+        }
+
+        body.dark .top-actions input,
+        body.dark .auth-box .input {
+            background: #0d1117;
+            color: #fff;
+            border: 1px solid #30363d
+        }
+
+        body.dark .cat {
+            color: #e6edf3;
+            background: rgba(255, 255, 255, 0.05)
+        }
+
+        body.dark .cat:hover {
+            background: rgba(30, 136, 229, 0.2)
+        }
+
+        body.dark .cat.active {
+            background: linear-gradient(90deg, #58a6ff, #1f6feb);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(88, 166, 255, 0.4)
+        }
+
+        body.dark .video-meta {
+            background: #161b22;
+            border-top: 1px solid #30363d
+        }
+
+        body.dark .icon-btn.liked {
+            background: linear-gradient(90deg, var(--accent), #ff7b8f)
+        }
+
+        body.dark .icon-btn svg path {
+            fill: var(--text)
+        }
+
+        body.dark .icon-btn.liked svg path {
+            fill: #fff
+        }
+
+        body.dark .tags button {
+            background: #161b22;
+            color: #e6edf3;
+            border: 1px solid #30363d
+        }
+
+        body.dark .tags button:hover {
+            background: var(--primary);
+            border-color: var(--primary)
+        }
+
+        body.dark .terms-content {
+            background: #0d1117;
+            border: 1px solid #30363d
+        }
+
+        /* responsive */
+        @media (max-width:1100px) {
+            .layout {
+                grid-template-columns: 1fr;
+                padding-bottom: 100px
+            }
+
+            .app {
+                padding-left: 12px;
+                padding-right: 12px
+            }
+
+            .top-actions input {
+                min-width: 120px
+            }
+
+            .sidebar.right,
+            .sidebar.left {
+                display: none
+            }
+
+            /* Oculta sidebars no mobile/tablet */
+            .top-actions input {
+                display: none
+            }
+
+            /* Esconde busca no topo, usa ícone */
+            .brand img {
+                width: 36px;
+                height: 36px
+            }
+
+            .topbar {
+                padding: 12px 10px;
+                border-radius: 0
+            }
+
+            .bottom-nav {
+                bottom: 0;
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: 0 -5px 20px rgba(11, 17, 32, 0.15)
+            }
+
+            .video-frame {
+                height: 70vh
+            }
+        }
+
+        @media (min-width:1101px) and (max-width:1300px) {
+            .layout {
+                grid-template-columns: 250px 1fr 280px
+            }
+        }
+    </style>
+
+    <svg style="display:none" aria-hidden="true">
+        <symbol id="icon-like" viewBox="0 0 24 24">
+            <path
+                d="M12 21s-7.5-4.6-9-7.3C1.5 11.9 3.5 7 8 7c2 0 4 2 4 2s2-2 4-2c4.5 0 6.5 4.9 5 6.7C19.5 16.4 12 21 12 21z" />
+        </symbol>
+        <symbol id="icon-comment" viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </symbol>
+        <symbol id="icon-share" viewBox="0 0 24 24">
+            <path d="M4 12v6h16v-6M12 6v12M12 6l-4 4M12 6l4 4" />
+        </symbol>
+        <symbol id="icon-home" viewBox="0 0 24 24">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H8v6H4a1 1 0 0 1-1-1V9.5z" />
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24">
+            <path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15" />
+        </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24">
+            <path d="M12 3v12m0-12l4 4M12 3l-4 4M21 21H3v-6" />
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.418 0-8 2-8 4v2h16v-2c0-2-3.582-4-8-4z" />
+        </symbol>
+    </svg>
+</head>
+
+<body>
+    <div class="app" id="app">
+
+        <header class="topbar">
+            <div class="brand">
+                <img id="brandLogo" src="logolifego-192x192.png" alt="Lifego"
+                    onerror="this.onerror=null;this.src='modelo.png'">
+                <div>
+                    <div class="brand-title">Lifego</div>
+                    <div class="brand-sub">Explorar • Criar</div>
+                </div>
+            </div>
+
+            <div class="top-actions" role="search">
+                <input id="topSearch" placeholder="Pesquisar criadores, tags..." aria-label="Pesquisar">
+                <button class="icon-btn" id="btnSearch" title="Buscar"><svg>
+                        <use xlink:href="#icon-search"></use>
+                    </svg></button>
+                <button class="icon-btn" id="btnNotif" title="Notificações"><img src="notificações.png"
+                        alt="notificações" onerror="this.onerror=null;this.src='modelo.png'"></button>
+                <button class="icon-btn" id="btnChat" title="Chat"><img src="chat.png" alt="chat"
+                        onerror="this.onerror=null;this.src='modelo.png'"></button>
+                <button class="icon-btn" id="btnAI" title="IA"><img src="ia.png" alt="IA"
+                        onerror="this.onerror=null;this.src='modelo.png'"></button>
+                <button class="icon-btn" id="btnGalleryTop" title="Galeria"><img src="galeria.png" alt="Galeria"
+                        onerror="this.onerror=null;this.src='modelo.png'"></button>
+
+                <div class="menu" id="menuRoot">
+                    <button id="menuBtn" class="icon-btn" title="Mais opções">⋮</button>
+                    <div id="menuDropdown" class="menu-dropdown hidden" aria-hidden="true">
+                        <div id="menuToggleTheme" class="menu-item">🌙 Alternar tema</div>
+                        <div id="menuOpenTerms" class="menu-item">📄 Termos de uso</div>
+                        <div id="menuProfile" class="menu-item">👤 Meu Perfil</div>
+                        <div id="menuLogout" class="menu-item">🚪 Sair</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="layout" role="main">
+            <aside class="card sidebar left">
+                <div class="card-title">Categorias <span class="badge" style="float:right">Top</span></div>
+                <div class="categories" id="categoriesList">
+                    <button class="cat active" data-cat="for-you">Para você</button>
+                    <button class="cat" data-cat="tech">Tecnologia</button>
+                    <button class="cat" data-cat="humor">Humor</button>
+                    <button class="cat" data-cat="vlog">Vlogs</button>
+                    <button class="cat" data-cat="dicas">Dicas</button>
+                    <button class="cat" data-cat="esportes">Esportes</button>
+                </div>
+
+                <hr style="margin:18px 0">
+
+                <div class="card-title">Criadores Sugeridos</div>
+                <div class="creators" id="suggestedCreators">
+                </div>
+
+            </aside>
+
+            <main class="main">
+                <div class="card feed-toolbar">
+                    <div>
+                        <strong>Feed Principal</strong>
+                        <div class="muted small">Role para mais conteúdo</div>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn ghost" id="refreshFeed" title="Atualizar">🔄</button>
+                        <button class="btn" id="openUploadBtn" title="Criar">Criar <svg
+                                style="width:14px;height:14px;margin-left:4px">
+                                <use xlink:href="#icon-upload"></use>
+                            </svg></button>
+                    </div>
+                </div>
+
+                <div id="feed" class="feed" aria-live="polite">
+                </div>
+            </main>
+
+            <aside class="card sidebar right">
+                <div class="card-title">Tags Populares</div>
+                <div id="popularTags" class="tags"></div>
+
+                <hr style="margin:18px 0">
+
+                <div class="card-title">Atalhos</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                    <button class="btn ghost" id="btnSaved" style="width:100%">Salvos</button>
+                    <button class="btn ghost" id="btnSettings" style="width:100%">Configurações</button>
+                    <button class="btn ghost" id="btnTerms" style="width:100%">Termos & Privacidade</button>
+                </div>
+
+                <div class="card" style="margin-top:18px; padding:10px; background:var(--glass)">
+                    <div class="card-title" style="margin-bottom:5px; color:var(--text)">Status PWA</div>
+                    <p class="muted small">App instalável (PWA-ready). Dados armazenados no seu navegador via
+                        localStorage.</p>
+                </div>
+            </aside>
+        </div>
+
+        <nav class="bottom-nav" role="navigation" aria-label="Navegação inferior">
+            <button id="navHome" title="Início" class="active"><svg>
+                    <use xlink:href="#icon-home"></use>
+                </svg><span class="small">Início</span></button>
+            <button id="navExplore" title="Explorar"><svg>
+                    <use xlink:href="#icon-search"></use>
+                </svg><span class="small">Explorar</span></button>
+            <button id="navCreate" title="Criar"><svg>
+                    <use xlink:href="#icon-upload"></use>
+                </svg><span class="small">Criar</span></button>
+            <button id="navProfileBtn" title="Perfil"><svg>
+                    <use xlink:href="#icon-user"></use>
+                </svg><span class="small">Perfil</span></button>
+        </nav>
+
+        <div id="modalBackdrop" class="modal-backdrop hidden" aria-hidden="true"></div>
+
+        <div id="termsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+            <h2 id="termsTitle">Termos de Uso — Lifego</h2>
+            <div class="terms-content">
+                <p><strong>Última atualização:</strong> 30/09/2025</p>
+                <p>Bem-vindo ao Lifego. Leia atentamente os termos abaixo antes de utilizar a aplicação demonstrativa.
+                </p>
+                <ol>
+                    <li>Ao utilizar a plataforma, você concorda com estes Termos de Uso;</li>
+                    <li>Idade mínima: 13 anos — menores necessitam de autorização dos responsáveis;</li>
+                    <li>Conteúdo que viole direitos autorais ou leis locais está proibido;</li>
+                    <li>O Lifego é um ambiente de demonstração — dados são armazenados localmente no navegador;</li>
+                    <li>Funções de IA devem ser usadas de forma ética e responsável;</li>
+                    <li>Moderadores automatizados podem remover conteúdo ofensivo;</li>
+                    <li>Para suporte: suporte@lifego.com;</li>
+                    <li>Estes termos podem ser atualizados — o uso contínuo após alteração implica concordância.</li>
+                </ol>
+                <p class="muted">Substitua este texto por termos reais caso vá usar em produção.</p>
+            </div>
+
+            <div class="modal-actions">
+                <label><input type="checkbox" id="termsAccept"> Li e aceito os termos</label>
+                <div>
+                    <button class="btn" id="acceptTermsBtn">Continuar</button>
+                    <button class="btn ghost" id="declineTermsBtn">Sair</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="authModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+            <div class="auth-box">
+                <h2 id="authTitle">Entrar no Lifego</h2>
+
+                <div id="loginPane">
+                    <p id="loginError" class="muted error"></p>
+                    <input class="input" id="loginName" placeholder="Usuário ou e-mail" aria-label="Usuário ou e-mail">
+                    <input class="input" id="loginPass" placeholder="Senha" type="password" aria-label="Senha">
+                    <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+                        <button class="btn" id="doLoginBtn">Entrar</button>
+                        <button class="btn ghost" id="showRegisterBtn">Criar conta</button>
+                    </div>
+                    <div class="muted small" style="margin-top:8px">Conta de teste: <b>lifego / 123456</b></div>
+                </div>
+
+                <div id="registerPane" class="hidden">
+                    <p id="regError" class="muted error"></p>
+                    <input class="input" id="regUser" placeholder="Nome de usuário">
+                    <input class="input" id="regEmail" placeholder="E-mail">
+                    <input class="input" id="regPass1" placeholder="Senha" type="password">
+                    <input class="input" id="regPass2" placeholder="Confirmar senha" type="password">
+                    <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+                        <button class="btn" id="doRegisterBtn">Criar conta</button>
+                        <button class="btn ghost" id="backToLoginBtn">Voltar</button>
+                    </div>
+                </div>
+
+                <button class="icon-btn close-modal" id="closeAuth" title="Fechar">×</button>
+            </div>
+        </div>
+
+        <div id="genericModal" class="modal hidden" role="dialog" aria-modal="true">
+            <div id="genericContent"></div>
+            <button class="icon-btn close-modal" id="closeGeneric">×</button>
+        </div>
+
+    </div>
+
+    <script>
+        /* ===============================
+   Lifego - Single-file JavaScript
+   ================================ */
+
+        /* ---------- Helpers ---------- */
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => Array.from(document.querySelectorAll(s));
+        const mk = (tag, attrs = {}, ...kids) => {
+            const el = document.createElement(tag);
+            for (const k in attrs) {
+                if (k === 'class') el.className = attrs[k];
+                else if (k === 'html') el.innerHTML = attrs[k];
+                else if (k === 'onclick') el.addEventListener('click', () => new Function(attrs[k])());
+                else el.setAttribute(k, attrs[k]);
+            }
+            kids.flat().forEach(c => {
+                if (typeof c === 'string') el.appendChild(document.createTextNode(c));
+                else if (c) el.appendChild(c);
+            });
+            return el;
+        };
+
+        /* ---------- Config + DB (LocalStorage) ---------- */
+        const CONFIG = {
+            placeholderImage: 'modelo.png',
+            placeholderVideo: 'modelo.mp4',
+            demoUser: { id: 'u_lifego', username: 'lifego', email: 'lifego@official.com', password: '123456' }
+        };
+
+        const DB = {
+            key(k) { return 'lifego_' + k; },
+            get(k, fallback = null) {
+                try {
+                    const raw = localStorage.getItem(this.key(k));
+                    return raw ? JSON.parse(raw) : fallback;
+                } catch (e) { return fallback; }
+            },
+            set(k, val) { localStorage.setItem(this.key(k), JSON.stringify(val)); },
+            // convenience
+            getUsers() { return this.get('users', []); },
+            setUsers(v) { this.set('users', v); },
+            getPosts() { return this.get('posts', []); },
+            setPosts(v) { this.set('posts', v); },
+            getSettings() { return this.get('settings', {}); },
+            setSettings(v) { this.set('settings', v); },
+            getCurrent() { return this.get('current', null); },
+            setCurrent(v) { this.set('current', v); }
+        };
+
+        /* ---------- Seed inicial (apenas na primeira vez) ---------- */
+        (function seed() {
+            if (!DB.getUsers().length) {
+                DB.setUsers([
+                    CONFIG.demoUser,
+                    { id: 'u_ana', username: 'ana_dev', email: 'ana@ex.com', password: '123' },
+                    { id: 'u_surfer', username: 'surfer_br', email: 'surf@ex.com', password: '123' }
+                ]);
+            }
+            if (!DB.getPosts().length) {
+                const posts = [
+                    { id: 'p0', author: 'lifego', caption: '🌟 Bem-vindo ao Lifego — o PWA que você pode instalar! Use a conta de teste lifego/123456.', mediaType: 'image', media: CONFIG.placeholderImage, likes: 999999, liked: false, comments: [{ author: 'ana_dev', text: 'Excelente projeto!' }], created: Date.now() - 86400000 },
+                    { id: 'p1', author: 'surfer_br', caption: 'Melhor onda do dia! O PWA está rápido. 🌊 #surf #pwa', mediaType: 'video', media: CONFIG.placeholderVideo, likes: 1245, liked: false, comments: [], created: Date.now() - 3600000 },
+                    { id: 'p2', author: 'techlover', caption: 'Dica de setup minimalista. O modo escuro ficou incrível! 💻 #tech #setup', mediaType: 'image', media: CONFIG.placeholderImage, likes: 521, liked: false, comments: [], created: Date.now() - 7200000 }
+                ];
+                DB.setPosts(posts);
+            }
+            if (!DB.getSettings().hasOwnProperty('darkMode')) DB.setSettings({ darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches });
+        })();
+
+        /* ---------- Theme / settings ---------- */
+        function applyTheme(isDark) {
+            if (isDark) document.body.classList.add('dark');
+            else document.body.classList.remove('dark');
+            const s = DB.getSettings() || {};
+            s.darkMode = !!isDark;
+            DB.setSettings(s);
+        }
+        (function restoreTheme() { const s = DB.getSettings(); applyTheme(s && s.darkMode); })();
+
+        /* ---------- Renderers ---------- */
+        function renderSuggestedCreators() {
+            const wrap = $('#suggestedCreators');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            const creators = [{ username: 'surfer_br', title: 'Surf' }, { username: 'techlover', title: 'Tech' }, { username: 'chef_lu', title: 'Culinária' }, { username: 'roadtrip', title: 'Viagens' }];
+            creators.forEach(c => {
+                const row = mk('div', { class: 'creator' },
+                    mk('img', { src: 'perfil.png', alt: c.username, onerror: `this.onerror=null;this.src='${CONFIG.placeholderImage}'` }),
+                    mk('div', {}, mk('div', {}, mk('b', {}, '@' + c.username)), mk('div', { class: 'muted small' }, c.title)),
+                    mk('button', { class: 'btn small', onclick: `alert('Seguir @${c.username} (simulado)')` }, 'Seguir')
+                );
+                wrap.appendChild(row);
+            });
+        }
+
+        function renderPopularTags() {
+            const wrap = $('#popularTags');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            const tags = ['#pwa', '#tech', '#surf', '#food', '#travel', '#fitness', '#ia', '#musica', '#diy'];
+            tags.forEach(t => {
+                const b = mk('button', { class: 'tag', onclick: `alert('Filtro: ${t} (simulado)')` }, t);
+                wrap.appendChild(b);
+            });
+        }
+
+        /* Feed render completo */
+        function renderFeed() {
+            const feed = $('#feed');
+            feed.innerHTML = '';
+            const posts = (DB.getPosts() || []).slice().sort((a, b) => b.created - a.created);
+            posts.forEach(post => {
+                const card = mk('article', { class: 'feed-card', id: 'post_' + post.id });
+
+                // frame
+                const frame = mk('div', { class: 'video-frame' });
+                if (post.mediaType === 'video') {
+                    const v = mk('video', { src: post.media || CONFIG.placeholderVideo, controls: true, playsinline: true });
+                    v.addEventListener('error', () => v.src = CONFIG.placeholderVideo);
+                    frame.appendChild(v);
+                } else {
+                    const img = mk('img', { src: post.media || CONFIG.placeholderImage, alt: post.caption || '', onerror: `this.onerror=null;this.src='${CONFIG.placeholderImage}'` });
+                    frame.appendChild(img);
+                }
+
+                // actions column
+                const actions = mk('div', { class: 'video-actions' });
+                // like
+                const likeBtn = mk('button', { class: 'icon-btn', title: 'Curtir', onclick: `toggleLike('${post.id}', this)` });
+                likeBtn.appendChild(mk('svg', { width: 18, height: 18 }, mk('use', { 'xlink:href': '#icon-like' })));
+                likeBtn.appendChild(mk('div', { style: 'font-size:11px;margin-top:6px; font-weight:700', class: 'small' }, (post.likes || 0).toLocaleString()));
+                if (post.liked) likeBtn.classList.add('liked');
+                actions.appendChild(likeBtn);
+
+                // comment
+                const cmBtn = mk('button', { class: 'icon-btn', title: 'Comentários', onclick: `openComments('${post.id}')` });
+                cmBtn.appendChild(mk('svg', { width: 18, height: 18 }, mk('use', { 'xlink:href': '#icon-comment' })));
+                cmBtn.appendChild(mk('div', { style: 'font-size:11px;margin-top:6px; font-weight:700', class: 'small' }, (post.comments || []).length));
+                actions.appendChild(cmBtn);
+
+                // share
+                const shBtn = mk('button', { class: 'icon-btn', title: 'Compartilhar', onclick: `sharePost('${post.id}')` });
+                shBtn.appendChild(mk('svg', { width: 18, height: 18 }, mk('use', { 'xlink:href': '#icon-share' })));
+                shBtn.appendChild(mk('div', { style: 'font-size:11px;margin-top:6px; font-weight:700', class: 'small' }, '...'));
+                actions.appendChild(shBtn);
+
+                frame.appendChild(actions);
+
+                // meta
+                const meta = mk('div', { class: 'video-meta' },
+                    mk('img', { src: 'perfil.png', alt: post.author, style: 'width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer', onerror: `this.onerror=null;this.src='${CONFIG.placeholderImage}'` }),
+                    mk('div', {},
+                        mk('div', { class: 'video-author', onclick: `alert('Abrir perfil de @${post.author} (simulado)')` }, '@' + post.author),
+                        mk('div', { class: 'video-desc' }, post.caption || '')
+                    ),
+                );
+
+                card.appendChild(frame);
+                card.appendChild(meta);
+                feed.appendChild(card);
+            });
+        }
+
+        /* ---------- Likes / Comments / Share ---------- */
+        function toggleLike(postId, btn) {
+            const posts = DB.getPosts();
+            const p = posts.find(x => x.id === postId);
+            if (!p) return;
+            const isLiked = p.liked;
+            p.liked = !isLiked;
+            p.likes = p.liked ? (p.likes || 0) + 1 : Math.max(0, (p.likes || 1) - 1);
+            DB.setPosts(posts);
+
+            // Atualiza o botão e o contador sem refazer o feed inteiro
+            if (p.liked) btn.classList.add('liked');
+            else btn.classList.remove('liked');
+            btn.querySelector('div.small').textContent = (p.likes || 0).toLocaleString();
+        }
+
+        function openComments(postId) {
+            const posts = DB.getPosts();
+            const p = posts.find(x => x.id === postId);
+            if (!p) return alert('Post não encontrado.');
+            const content = $('#genericContent');
+            content.innerHTML = '';
+            content.appendChild(mk('h3', {}, `Comentários — @${p.author}`));
+
+            const list = mk('div', { class: 'comments-list' });
+            (p.comments || []).forEach(c => list.appendChild(mk('div', {}, mk('b', {}, c.author), ': ' + c.text)));
+            if ((p.comments || []).length === 0) list.appendChild(mk('div', { class: 'muted' }, 'Seja o primeiro a comentar!'));
+            content.appendChild(list);
+
+            const input = mk('input', { class: 'input', placeholder: 'Escreva um comentário...', style: 'margin-top:8px' });
+            const send = mk('button', { class: 'btn', style: 'margin-top:8px' }, 'Enviar');
+
+            send.addEventListener('click', () => {
+                const txt = input.value.trim();
+                if (!txt) return alert('Digite algo.');
+                const cur = DB.getCurrent();
+                const author = cur ? cur.username : 'Anônimo';
+                p.comments = p.comments || [];
+                p.comments.push({ author, text: txt });
+                DB.setPosts(posts);
+                hideModalGeneric();
+                // Re-renderiza o feed ou o post para atualizar o contador de comentários
+                renderFeed();
+                alert('Comentário adicionado (simulado).');
+            });
+            content.appendChild(input);
+            content.appendChild(send);
+            showModalGeneric();
+        }
+
+        function sharePost(postId) {
+            const url = window.location.href + '#post_' + postId;
+            if (navigator.share) {
+                navigator.share({ title: 'Post Lifego', text: 'Dê uma olhada neste post no Lifego!', url }).catch(() => { });
+            } else {
+                navigator.clipboard.writeText(url).then(() => alert('Link copiado (simulado).'));
+            }
+        }
+
+        /* ---------- Gallery / Upload ---------- */
+        function openGallery() {
+            const posts = DB.getPosts();
+            const media = posts.filter(p => p.mediaType === 'image' || p.mediaType === 'video').map(p => ({ media: p.media, type: p.mediaType }));
+            const content = $('#genericContent');
+            content.innerHTML = '';
+            content.appendChild(mk('h3', {}, 'Galeria de Mídias'));
+            const grid = mk('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:8px' });
+            (media.length ? media : [{ media: CONFIG.placeholderImage, type: 'image' }]).forEach(item => {
+                if (item.type === 'image') {
+                    const img = mk('img', { src: item.media, style: 'width:100%;height:120px;object-fit:cover;border-radius:8px', onerror: `this.onerror=null;this.src='${CONFIG.placeholderImage}'` });
+                    grid.appendChild(img);
+                } else {
+                    const vid = mk('video', { src: item.media, style: 'width:100%;height:120px;object-fit:cover;border-radius:8px', onerror: `this.onerror=null;this.src='${CONFIG.placeholderVideo}'` });
+                    grid.appendChild(vid);
+                }
+            });
+            content.appendChild(grid);
+            showModalGeneric();
+        }
+
+        function openUploadDialog() {
+            const content = $('#genericContent');
+            content.innerHTML = '';
+            content.appendChild(mk('h3', {}, 'Criar publicação'));
+            const fileIn = mk('input', { type: 'file', accept: 'image/*,video/*', style: 'margin-bottom:12px' });
+            const caption = mk('input', { class: 'input', placeholder: 'Legenda para o post' });
+            const submit = mk('button', { class: 'btn', style: 'width:100%' }, 'Carregar Conteúdo');
+
+            submit.addEventListener('click', () => {
+                const f = fileIn.files[0];
+                if (!f) return alert('Escolha uma mídia para publicar.');
+
+                // Simulação de URL local, em produção seria o retorno do servidor
+                const url = URL.createObjectURL(f);
+                const type = f.type.startsWith('video') ? 'video' : 'image';
+                const cur = DB.getCurrent();
+                if (!cur) { alert('Faça login para publicar.'); return; }
+
+                // Simula um tempo de upload
+                submit.textContent = 'Carregando...';
+                submit.disabled = true;
+
+                setTimeout(() => {
+                    const posts = DB.getPosts();
+                    const newPost = {
+                        id: 'p_' + Date.now(),
+                        author: cur.username,
+                        caption: caption.value.trim() || 'Nova publicação!',
+                        mediaType: type,
+                        media: url,
+                        likes: 0, liked: false, comments: [], created: Date.now()
+                    };
+                    posts.unshift(newPost);
+                    DB.setPosts(posts);
+                    hideModalGeneric();
+                    renderFeed();
+                    alert('Upload concluído. Post adicionado ao feed!');
+                }, 1500); // 1.5s de simulação
+            });
+
+            content.appendChild(fileIn);
+            content.appendChild(caption);
+            content.appendChild(submit);
+            showModalGeneric();
+        }
+
+        /* ---------- Auth (login / register / logout) ---------- */
+        function showAuth(login = true) {
+            $('#modalBackdrop').classList.remove('hidden');
+            $('#authModal').classList.remove('hidden');
+            if (login) {
+                $('#loginPane').classList.remove('hidden');
+                $('#registerPane').classList.add('hidden');
+                $('#authTitle').innerText = 'Entrar no Lifego';
+            } else {
+                $('#loginPane').classList.add('hidden');
+                $('#registerPane').classList.remove('hidden');
+                $('#authTitle').innerText = 'Criar conta';
+            }
+        }
+
+        function hideAuth() {
+            $('#modalBackdrop').classList.add('hidden');
+            $('#authModal').classList.add('hidden');
+            $('#loginError').textContent = '';
+            $('#regError').textContent = '';
+        }
+
+        function doLogin() {
+            const name = $('#loginName').value.trim();
+            const pass = $('#loginPass').value.trim();
+            if (!name || !pass) { $('#loginError').textContent = 'Preencha usuário e senha.'; return; }
+            const users = DB.getUsers();
+            const found = users.find(u => (u.username === name || u.email === name) && u.password === pass);
+            if (!found) { $('#loginError').textContent = 'Usuário ou senha incorretos.'; return; }
+            DB.setCurrent({ id: found.id, username: found.username, email: found.email });
+            hideAuth();
+            renderFeed();
+            alert('Bem-vindo(a), ' + found.username);
+        }
+
+        function doRegister() {
+            const user = $('#regUser').value.trim(), email = $('#regEmail').value.trim();
+            const p1 = $('#regPass1').value, p2 = $('#regPass2').value;
+            if (!user || !email || !p1 || !p2) { $('#regError').textContent = 'Preencha todos os campos.'; return; }
+            if (p1 !== p2) { $('#regError').textContent = 'As senhas não coincidem.'; return; }
+            if (p1.length < 6) { $('#regError').textContent = 'A senha deve ter no mínimo 6 caracteres.'; return; }
+            const users = DB.getUsers();
+            if (users.find(u => u.username === user)) { $('#regError').textContent = 'Nome de usuário já existe.'; return; }
+            if (users.find(u => u.email === email)) { $('#regError').textContent = 'E-mail já cadastrado.'; return; }
+            const newU = { id: 'u_' + Date.now(), username: user, email, password: p1 };
+            users.push(newU);
+            DB.setUsers(users);
+            DB.setCurrent({ id: newU.id, username: newU.username, email: newU.email });
+            hideAuth();
+            renderSuggestedCreators();
+            renderFeed();
+            alert('Conta criada! Bem-vindo(a), ' + user);
+        }
+
+        function doLogout() {
+            DB.setCurrent(null);
+            alert('Você saiu da conta.');
+            showTermsIfFirstRun();
+            renderFeed();
+        }
+
+        /* ---------- Modal helpers ---------- */
+        function showModalGeneric() { $('#modalBackdrop').classList.remove('hidden'); $('#genericModal').classList.remove('hidden'); }
+        function hideModalGeneric() { $('#modalBackdrop').classList.add('hidden'); $('#genericModal').classList.add('hidden'); }
+
+        /* ---------- Terms / first-run ---------- */
+        function showTermsIfFirstRun() {
+            const s = DB.getSettings() || {};
+            if (!s.termsAccepted) {
+                $('#modalBackdrop').classList.remove('hidden');
+                $('#termsModal').classList.remove('hidden');
+            } else {
+                if (!DB.getCurrent()) showAuth(true);
+            }
+        }
+
+        /* ---------- Search ---------- */
+        function doSearch() {
+            const q = $('#topSearch').value.trim().toLowerCase();
+            if (!q) return renderFeed();
+            const posts = DB.getPosts().filter(p => (p.caption || '').toLowerCase().includes(q) || p.author.toLowerCase().includes(q));
+            const feed = $('#feed');
+            feed.innerHTML = '';
+
+            if (posts.length === 0) {
+                feed.appendChild(mk('div', { style: 'text-align:center; padding:50px; color:var(--muted)' }, 'Nenhum resultado encontrado para "' + q + '"'));
+                return;
+            }
+
+            posts.forEach(p => {
+                const card = mk('div', { class: 'feed-card' });
+                const meta = mk('div', { class: 'video-meta' }, mk('div', {}, mk('div', { class: 'video-author' }, '@' + p.author), mk('div', { class: 'video-desc' }, p.caption)));
+                const frame = mk('div', { class: 'video-frame' }, p.mediaType === 'video' ? mk('video', { src: p.media, controls: true, onerror: `this.onerror=null;this.src='${CONFIG.placeholderVideo}'` }) : mk('img', { src: p.media, onerror: `this.onerror=null;this.src='${CONFIG.placeholderImage}'` }));
+                card.appendChild(meta);
+                card.appendChild(frame);
+                feed.appendChild(card);
+            });
+        }
+
+        /* ---------- Bind UI ---------- */
+        function bindUI() {
+            // menu
+            $('#menuBtn').addEventListener('click', () => $('#menuDropdown').classList.toggle('hidden'));
+            $('#menuToggleTheme').addEventListener('click', () => {
+                const s = DB.getSettings() || {};
+                const newMode = !s.darkMode;
+                applyTheme(newMode);
+                $('#menuDropdown').classList.add('hidden');
+            });
+            $('#menuOpenTerms').addEventListener('click', () => { $('#menuDropdown').classList.add('hidden'); $('#modalBackdrop').classList.remove('hidden'); $('#termsModal').classList.remove('hidden'); });
+            $('#menuLogout').addEventListener('click', () => { $('#menuDropdown').classList.add('hidden'); doLogout(); });
+            $('#menuProfile').addEventListener('click', () => { alert('Abrir perfil (simulado)'); $('#menuDropdown').classList.add('hidden'); });
+
+            // terms
+            $('#acceptTermsBtn').addEventListener('click', () => {
+                const ok = $('#termsAccept').checked;
+                if (!ok) return alert('Você precisa aceitar os termos para continuar.');
+                const s = DB.getSettings() || {};
+                s.termsAccepted = true;
+                DB.setSettings(s);
+                $('#termsModal').classList.add('hidden');
+                $('#modalBackdrop').classList.add('hidden');
+                if (!DB.getCurrent()) showAuth(true);
+            });
+            $('#declineTermsBtn').addEventListener('click', () => alert('O uso da plataforma requer a aceitação dos termos.'));
+
+            // auth
+            $('#doLoginBtn').addEventListener('click', doLogin);
+            $('#showRegisterBtn').addEventListener('click', () => showAuth(false));
+            $('#backToLoginBtn').addEventListener('click', () => showAuth(true));
+            $('#doRegisterBtn').addEventListener('click', doRegister);
+            $('#closeAuth').addEventListener('click', hideAuth);
+
+            // generic modal close
+            $('#closeGeneric').addEventListener('click', hideModalGeneric);
+            $('#modalBackdrop').addEventListener('click', (e) => {
+                if (e.target.id === 'modalBackdrop' && $('#termsModal').classList.contains('hidden')) {
+                    if (!$('#genericModal').classList.contains('hidden')) hideModalGeneric();
+                    if (!$('#authModal').classList.contains('hidden')) hideAuth();
+                }
+            });
+
+            // topbar/feed controls
+            $('#refreshFeed').addEventListener('click', renderFeed);
+            $('#openUploadBtn').addEventListener('click', openUploadDialog);
+            $('#openGalleryBtn').addEventListener('click', openGallery);
+            $('#btnGalleryTop').addEventListener('click', openGallery);
+            $('#btnSearch').addEventListener('click', doSearch);
+            $('#topSearch').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
+
+            $('#btnSaved').addEventListener('click', () => alert('Salvos (simulado)'));
+            $('#btnSettings').addEventListener('click', () => alert('Configurações (simulado)'));
+            $('#btnTerms').addEventListener('click', () => { $('#modalBackdrop').classList.remove('hidden'); $('#termsModal').classList.remove('hidden'); });
+
+            // bottom nav
+            $('#navHome').addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); $$('.bottom-nav button').forEach(b => b.classList.remove('active')); $('#navHome').classList.add('active'); });
+            $('#navExplore').addEventListener('click', () => { alert('Explorar/Search (simulado)'); $$('.bottom-nav button').forEach(b => b.classList.remove('active')); $('#navExplore').classList.add('active'); });
+            $('#navCreate').addEventListener('click', openUploadDialog);
+            $('#navProfileBtn').addEventListener('click', () => {
+                const cur = DB.getCurrent();
+                if (!cur) showAuth(true);
+                else alert(`Perfil: ${cur.username}\nE-mail: ${cur.email}`);
+                $$('.bottom-nav button').forEach(b => b.classList.remove('active'));
+                $('#navProfileBtn').classList.add('active');
+            });
+
+            // categories
+            $$('#categoriesList .cat').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    $$('#categoriesList .cat').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    alert('Filtro de categoria aplicado: ' + btn.dataset.cat + ' (simulado)');
+                });
+            });
+
+            // top actions
+            $('#btnNotif').addEventListener('click', () => alert('Notificações (simulado)'));
+            $('#btnChat').addEventListener('click', () => alert('Chat (simulado)'));
+            $('#btnAI').addEventListener('click', () => alert('Ações de IA (simulado)'));
+        }
+
+        /* ---------- Start ---------- */
+        function startApp() {
+            renderSuggestedCreators();
+            renderPopularTags();
+            renderFeed();
+            bindUI();
+            // first-run: termos
+            showTermsIfFirstRun();
+
+
+            // register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js').then(() => console.log('SW registrado')).catch(() => { });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', startApp);
+
+        /* End of file */
+    </script>
+</body>
+
+</html>
