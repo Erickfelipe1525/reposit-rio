@@ -18,7 +18,9 @@ self.addEventListener("install", event => {
         "perfil.png",
         "procurar.png",
         "upload.png",
-        "voltar.png"
+        "voltar.png",
+        "configuracoes.png",
+        "modo-escuro.png"
       ]);
     })
   );
@@ -28,4 +30,5 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
   );
+
 });
