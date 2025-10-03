@@ -20,7 +20,8 @@ self.addEventListener("install", event => {
         "upload.png",
         "voltar.png",
         "configuracoes.png",
-        "modo-escuro.png"
+        "modo-escuro.png",
+        "download.png"
       ]);
     })
   );
